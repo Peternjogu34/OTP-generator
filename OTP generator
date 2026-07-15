@@ -1,0 +1,54 @@
+import secrets
+import string
+import time
+
+
+class OTPGenerator:
+    def __init__(self, length=6, expiry=300):
+        """
+        length: Number of digits in the OTP
+        expiry: OTP validity in seconds (default 5 minutes)
+        """
+        self.length = length
+        self.expiry = expiry
+        self.otp = None
+        self.generated_time = None
+
+    def generate_otp(self):
+        """Generate a secure numeric OTP."""
+        digits = string.digits
+        self.otp = ''.join(secrets.choice(digits) for _ in range(self.length))
+        self.generated_time = time.time()
+        return self.otp
+
+    def verify_otp(self, entered_otp):
+        """Verify if the OTP is correct and not expired."""
+        if self.otp is None:
+            return "No OTP has been generated."
+
+        current_time = time.time()
+
+        if current_time - self.generated_time > self.expiry:
+            self.otp = None
+            return "OTP has expired."
+
+        if entered_otp == self.otp:
+            self.otp = None  # Prevent OTP reuse
+            return "OTP verified successfully!"
+
+        return "Invalid OTP."
+
+
+# -------------------------------
+# Example Usage
+# -------------------------------
+
+otp_system = OTPGenerator(length=6, expiry=300)
+
+otp = otp_system.generate_otp()
+print(f"Generated OTP: {otp}")
+
+user_input = input("Enter OTP: ")
+
+result = otp_system.verify_otp(user_input)
+print(result)
